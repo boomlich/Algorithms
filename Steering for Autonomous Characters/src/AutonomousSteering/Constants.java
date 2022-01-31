@@ -10,6 +10,8 @@ public class Constants {
     public static final int SPAWN_X = 50;
     public static final int SPAWN_Y = 50;
     public static final int NPC_SIZE = 40;
+    public static final int CORNER_SIZE = 25;
+
 
     public static final int DEBUG_SIZE = 5;
     public static final int TARGET_OFFSET = 5;
@@ -27,6 +29,11 @@ public class Constants {
 
     public static final int AI_COUNT = 4;
     public static final boolean RND_SPAWN = true;
+
+    public static double INSETS_TOP = 0;
+    public static double INSETS_BOTTOM = 0;
+    public static double INSETS_SIDES = 0;
+
 
 
     // Track initialisation corners

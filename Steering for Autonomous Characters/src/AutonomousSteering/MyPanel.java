@@ -34,9 +34,12 @@ public class MyPanel extends JPanel implements ActionListener{
         }
 
         Track track = new Track();
+        getPath();
+    }
+
+    private void getPath() {
         followPath = Track.getTrackPath();
         points = Track.getTrackCoordinates();
-
     }
 
 
@@ -66,18 +69,30 @@ public class MyPanel extends JPanel implements ActionListener{
         g2D.setColor(Color.WHITE);
         g2D.draw(followPath);
 
-
         // Draw AI
         for (AI x: listAI) {
             drawCustomCircle(x.body, Color.orange, g2D);
-            if (Constants.DEBUG) {
-                drawCustomCircle(x.futurePos, Color.green, g2D);
-                drawCustomCircle(x.onLine, Color.MAGENTA, g2D);
-                drawCustomCircle(x.target, Color.red, g2D);
-            }
+        }
+
+        if (Constants.DEBUG) {
+            drawDebug(g2D, listAI);
         }
 
         g2D.dispose();
+    }
+
+    private static void drawDebug(Graphics2D g2D, AI[] listAI) {
+        // AI targets
+        for (AI x: listAI) {
+            drawCustomCircle(x.futurePos, Color.green, g2D);
+            drawCustomCircle(x.onLine, Color.MAGENTA, g2D);
+            drawCustomCircle(x.target, Color.red, g2D);
+        }
+
+        // Track corner-points
+        for (Ellipse2D.Double corner: Track.getCornerShapes()) {
+            drawCustomCircle(corner, Color.CYAN, g2D);
+        }
     }
 
 
@@ -88,6 +103,11 @@ public class MyPanel extends JPanel implements ActionListener{
         // Update all AI
         for (AI x: listAI) {
             x.update();
+        }
+
+        if (MouseInput.isMouseActivated()) {
+            Track.update();
+            getPath();
         }
 
         repaint();
