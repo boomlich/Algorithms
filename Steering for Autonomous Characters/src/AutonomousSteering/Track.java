@@ -8,8 +8,8 @@ import java.util.LinkedList;
 public class Track {
 
     ArrayList<int[]> cornerPoints = new ArrayList<>();
-    LinkedList<double[]> trackCoordinates = new LinkedList<>();
-    Path2D.Double trackPath;
+    private static LinkedList<double[]> trackCoordinates = new LinkedList<>();
+    private static Path2D.Double trackPath;
 
     public Track() {
         cornerPoints.addAll(Arrays.asList(Constants.TRACK_CORNERS));
@@ -45,11 +45,11 @@ public class Track {
         }
     }
 
-    public Path2D.Double getTrackPath(){
+    public static Path2D.Double getTrackPath(){
         return trackPath;
     }
 
-    public LinkedList<double[]> getTrackCoordinates() {
+    public static LinkedList<double[]> getTrackCoordinates() {
         return trackCoordinates;
     }
 }

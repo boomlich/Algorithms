@@ -2,53 +2,75 @@ package AutonomousSteering;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.util.Arrays;
+import java.util.Random;
 
 public class AI extends Ellipse2D.Double {
 
-    double[] velocity = Constants.VELOCITY;
-    double[] acceleration = Constants.ACCELERATION;
-    int predictDistance = 15;
-    int predictPointIndex = 0;
-    int targetOffset = 5;
+    private double[] velocity = Arrays.copyOf(Constants.VELOCITY, 2);
+    private double[] acceleration = Arrays.copyOf(Constants.ACCELERATION, 2);
 
-    public AI(int x, int y, int size) {
-        new Ellipse2D.Double(x, y, size, size);
-        setFrame(new Rectangle(x, y, size, size));
-    }
+    Ellipse2D.Double body;
+    Ellipse2D.Double futurePos;
+    Ellipse2D.Double onLine;
+    Ellipse2D.Double target;
 
-    public void updateForces() {
-        // Apply acceleration
-        velocity[0] += acceleration[0];
-        velocity[1] += acceleration[1];
 
-        double velocityLength = VectorMath.vectorLength(0, velocity[0], 0, velocity[1]);
-        if (velocityLength > Constants.MAX_SPEED) {
-            VectorMath.limitVector(velocity, Constants.MAX_SPEED);
+    public AI(int x, int y) {
+        if (Constants.RND_SPAWN) {
+            Random random = new Random();
+            x = random.nextInt(Constants.PANEL_WIDTH) + 1;
+            y = random.nextInt(Constants.PANEL_HEIGHT) + 1;
         }
 
-        // Apply velocity
-        this.x += velocity[0];
-        this.y += velocity[1];
+        body = new Ellipse2D.Double(x, y, Constants.NPC_SIZE, Constants.NPC_SIZE);
+        body.setFrame(new Rectangle(x, y, Constants.NPC_SIZE, Constants.NPC_SIZE));
 
-        // Reset acceleration
-        acceleration[0] = 0;
-        acceleration[1] = 0;
+        // Debugging tools
+        futurePos = new Ellipse2D.Double(500, 500, Constants.DEBUG_SIZE, Constants.DEBUG_SIZE);
+        futurePos.setFrame(new Rectangle(500, 500, Constants.DEBUG_SIZE, Constants.DEBUG_SIZE));
+
+        onLine = new Ellipse2D.Double(500, 500, Constants.DEBUG_SIZE, Constants.DEBUG_SIZE);
+        onLine.setFrame(new Rectangle(500, 500, Constants.DEBUG_SIZE, Constants.DEBUG_SIZE));
+
+        target = new Ellipse2D.Double(0, 0, Constants.DEBUG_SIZE, Constants.DEBUG_SIZE);
+        target.setFrame(new Rectangle(0, 0, Constants.DEBUG_SIZE, Constants.DEBUG_SIZE));
     }
 
-
-    public void seek(double targetX, double targetY) {
-        // Calculate desired velocity and limit by max speed
-        double[] desiredVector = {targetX - this.x, targetY - this.y};
-        VectorMath.limitVector(desiredVector, Constants.MAX_SPEED);
-
-        // Calculate steering force and limit by max force
-        double[] steeringVec = {desiredVector[0] - velocity[0], desiredVector[1] - velocity[1]};
-        VectorMath.limitVector(steeringVec, Constants.MAX_FORCE);
-        applyForce(steeringVec);
+    public void update() {
+        AIPathFollowing.seek(this);
+        Physics.updateForces(this);
     }
 
-    public void applyForce(double[] force) {
-        System.out.println("test");
-        acceleration = force;
+    public Ellipse2D.Double getBody() {
+        return body;
+    }
+
+    public Double getFuturePos() {
+        return futurePos;
+    }
+
+    public Double getOnLine() {
+        return onLine;
+    }
+
+    public Double getTarget() {
+        return target;
+    }
+
+    public double[] getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(double[] velocity) {
+        this.velocity = velocity;
+    }
+
+    public double[] getAcceleration() {
+        return acceleration;
+    }
+
+    public void setAcceleration(double[] acceleration) {
+        this.acceleration = acceleration;
     }
 }
