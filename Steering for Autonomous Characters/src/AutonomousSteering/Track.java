@@ -14,13 +14,12 @@ public class Track {
     private static LinkedList<double[]> trackCoordinates = new LinkedList<>();
     private static Path2D.Double trackPath;
     static ArrayList<Ellipse2D.Double> cornerShapes = new ArrayList<>();
+    static ArrayList<Integer> segmentPointIndex = new ArrayList<>();
+
 
     public Track() {
         cornerPoints.addAll(Arrays.asList(Constants.TRACK_CORNERS));
-        constructTrack();
-        calcAllCoordinates();
-        constructCorners();
-
+        initializeTrack();
     }
 
     private static void constructCorners() {
@@ -41,6 +40,7 @@ public class Track {
 
     private static void calcAllCoordinates(){
         trackCoordinates.clear();
+        segmentPointIndex.clear();
         double totalPathLength = 0;
         for (int i = 0; i < cornerPoints.size(); i++) {
             int x1 = cornerPoints.get(i)[0];
@@ -51,25 +51,38 @@ public class Track {
             double segmentLength = VectorMath.vectorLength(x1, x2, y1, y2);
             totalPathLength += segmentLength;
 
+            int pointCount = 0;
             for (int j = 0; j < (int) segmentLength; j+= Constants.TRACK_RESOLUTION) {
                 trackCoordinates.add(new double[]{x1 + (x2 - x1) / segmentLength * j,
                                                   y1 + (y2 - y1) / segmentLength * j});
+                pointCount ++;
             }
+            segmentPointIndex.add(pointCount);
         }
     }
 
     public static void update() {
+        // Update selected point
         Point p = MouseInfo.getPointerInfo().getLocation();
-        int mousediffX = p.x - MyFrame.getFrameX() - MouseInput.getX();
-        int mousediffY = p.y - MyFrame.getFrameY() - MouseInput.getY();
+        p.x -= MyFrame.getFrameX();
+        p.y -= MyFrame.getFrameY() + Constants.CORNER_SIZE;
+        cornerPoints.set(MouseInput.getSelectedPoint(), new int[]{p.x, p.y});
 
-//        System.out.println(mousediffX + " ::: " + MouseInput.getX());
-//        System.out.println(mousediffX);
+        initializeTrack();
+    }
 
-        cornerPoints.set(MouseInput.getSelectedPoint(), new int[]{p.x - MyFrame.getFrameX(), p.y - MyFrame.getFrameY() - Constants.CORNER_SIZE});
+    private static void initializeTrack() {
         constructTrack();
         calcAllCoordinates();
         constructCorners();
+    }
+
+    public static void reset(){
+        cornerPoints.clear();
+        cornerPoints.addAll(Arrays.asList(Constants.TRACK_CORNERS));
+        initializeTrack();
+        Constants.RESET = true;
+
     }
 
     public static Path2D.Double getTrackPath(){
@@ -86,5 +99,9 @@ public class Track {
 
     public static ArrayList<Ellipse2D.Double> getCornerShapes() {
         return cornerShapes;
+    }
+
+    public static ArrayList<Integer> getSegmentPointIndex() {
+        return segmentPointIndex;
     }
 }

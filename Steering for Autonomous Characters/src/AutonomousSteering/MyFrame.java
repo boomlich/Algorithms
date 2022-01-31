@@ -14,6 +14,7 @@ public class MyFrame extends JFrame{
 
         panel = new MyPanel();
         this.addMouseListener(new MouseInput());
+        this.addKeyListener(new KeyInput());
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);

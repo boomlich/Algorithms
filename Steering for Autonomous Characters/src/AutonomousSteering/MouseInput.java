@@ -11,16 +11,16 @@ public class MouseInput implements MouseListener {
     private static int selectedPoint;
     private static int x;
     private static int y;
+    private static double[] closestPoint = new double[2];
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
+    public void mouseClicked(MouseEvent e) {}
 
     @Override
     public void mousePressed(MouseEvent e) {
         x = e.getX() - (int) Constants.INSETS_SIDES;
         y = e.getY() - (int) Constants.INSETS_TOP;
+        closestPoint = new double[]{-1,-1};
 
 
         // Check if clicked on a corner point
@@ -36,23 +36,50 @@ public class MouseInput implements MouseListener {
             }
             i ++;
         }
+
+        // Check if clicked on path segment
+        if (!mouseActivated) {
+            int j = 0;
+            double smallestDistance = 1000000;
+            for (double[] coord: Track.getTrackCoordinates()) {
+                double distance = VectorMath.vectorLength(x, coord[0], y, coord[1]);
+                if (distance < smallestDistance) {
+                    smallestDistance = distance;
+                    closestPoint[0] = coord[0];
+                    closestPoint[1] = coord[1];
+                    selectedPoint = j;
+                }
+                j ++;
+            }
+            if (smallestDistance < Constants.TRACK_SEG_INTERACT_LIMIT) {
+                int sum = 0;
+                for (int k = 0; k < Track.getSegmentPointIndex().size()+1; k++) {
+                    if (sum < selectedPoint) {
+                        sum += Track.getSegmentPointIndex().get(k);
+                    } else {
+                        System.out.println("point: " + selectedPoint + "     belongs in: " + k);
+                        Track.cornerPoints.add(k, new int[]{x, y});
+                        selectedPoint = k;
+                        break;
+                    }
+                }
+                System.out.println(selectedPoint);
+                mouseActivated = true;
+            }
+        }
+
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("Mouse released");
         mouseActivated = false;
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
+    public void mouseExited(MouseEvent e) {}
 
     public static boolean isMouseActivated() {
         return mouseActivated;
@@ -68,5 +95,9 @@ public class MouseInput implements MouseListener {
 
     public static int getY() {
         return y;
+    }
+
+    public static double[] getClosestPoint() {
+        return closestPoint;
     }
 }

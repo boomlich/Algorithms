@@ -24,8 +24,10 @@ public class Constants {
     public static final int REFRESH_RATE = 10;
 
     public static final int TRACK_RADIUS = 25;
+    public static final int TRACK_SEG_INTERACT_LIMIT = 25;
 
-    public static final boolean DEBUG = true;
+    public static boolean DEBUG = false;
+    public static boolean SHOW_PATH = true;
 
     public static final int AI_COUNT = 4;
     public static final boolean RND_SPAWN = true;
@@ -33,6 +35,8 @@ public class Constants {
     public static double INSETS_TOP = 0;
     public static double INSETS_BOTTOM = 0;
     public static double INSETS_SIDES = 0;
+
+    public static boolean RESET = false;
 
 
 

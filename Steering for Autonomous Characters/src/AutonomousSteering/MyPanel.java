@@ -8,19 +8,10 @@ import javax.swing.*;
 
 public class MyPanel extends JPanel implements ActionListener{
 
-
     Timer timer;
-
-
-//    AI ai = new AI(Constants.SPAWN_X, Constants.SPAWN_Y);
-//    AI ai1 = new AI(500, 700);
     AI[] listAI = new AI[Constants.AI_COUNT];
-
     Path2D.Double followPath;
     LinkedList<double[]> points = new LinkedList<>();
-
-
-
 
     MyPanel(){
         this.setPreferredSize(new Dimension(Constants.PANEL_WIDTH,Constants.PANEL_HEIGHT));
@@ -28,12 +19,12 @@ public class MyPanel extends JPanel implements ActionListener{
         timer = new Timer(Constants.REFRESH_RATE, this);
         timer.start();
 
-
+        // Add AI to the track
         for (int i = 0; i < Constants.AI_COUNT; i++) {
             listAI[i] = new AI(0, 0);
         }
 
-        Track track = new Track();
+        new Track();
         getPath();
     }
 
@@ -41,7 +32,6 @@ public class MyPanel extends JPanel implements ActionListener{
         followPath = Track.getTrackPath();
         points = Track.getTrackCoordinates();
     }
-
 
     public static void drawCustomCircle(Ellipse2D.Double shape, Color color, Graphics2D g2D) {
         AffineTransform reset = g2D.getTransform();
@@ -61,13 +51,15 @@ public class MyPanel extends JPanel implements ActionListener{
         g2D.setRenderingHints(rh);
 
         // Draw path
-        g2D.setColor(new Color(40, 40, 40));
-        g2D.setStroke(new BasicStroke(Constants.TRACK_RADIUS * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2D.draw(followPath);
+        if (Constants.SHOW_PATH) {
+            g2D.setColor(new Color(40, 40, 40));
+            g2D.setStroke(new BasicStroke(Constants.TRACK_RADIUS * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2D.draw(followPath);
 
-        g2D.setStroke(new BasicStroke(2));
-        g2D.setColor(Color.WHITE);
-        g2D.draw(followPath);
+            g2D.setStroke(new BasicStroke(2));
+            g2D.setColor(Color.WHITE);
+            g2D.draw(followPath);
+        }
 
         // Draw AI
         for (AI x: listAI) {
@@ -107,6 +99,10 @@ public class MyPanel extends JPanel implements ActionListener{
 
         if (MouseInput.isMouseActivated()) {
             Track.update();
+            getPath();
+        }
+
+        if (Constants.RESET) {
             getPath();
         }
 
