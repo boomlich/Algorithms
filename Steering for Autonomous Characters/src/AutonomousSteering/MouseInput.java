@@ -22,7 +22,6 @@ public class MouseInput implements MouseListener {
         y = e.getY() - (int) Constants.INSETS_TOP;
         closestPoint = new double[]{-1,-1};
 
-
         // Check if clicked on a corner point
         int i = 0;
         for (Ellipse2D.Double corner: Track.getCornerShapes()) {
@@ -39,35 +38,24 @@ public class MouseInput implements MouseListener {
 
         // Check if clicked on path segment
         if (!mouseActivated) {
-            int j = 0;
-            double smallestDistance = 1000000;
-            for (double[] coord: Track.getTrackCoordinates()) {
-                double distance = VectorMath.vectorLength(x, coord[0], y, coord[1]);
-                if (distance < smallestDistance) {
-                    smallestDistance = distance;
-                    closestPoint[0] = coord[0];
-                    closestPoint[1] = coord[1];
-                    selectedPoint = j;
-                }
-                j ++;
-            }
+            double[] findPoint = VectorMath.nearestPoint(x, y, selectedPoint, closestPoint);
+            double smallestDistance = findPoint[0];
+            selectedPoint = (int) findPoint[1];
+
             if (smallestDistance < Constants.TRACK_SEG_INTERACT_LIMIT) {
                 int sum = 0;
                 for (int k = 0; k < Track.getSegmentPointIndex().size()+1; k++) {
                     if (sum < selectedPoint) {
                         sum += Track.getSegmentPointIndex().get(k);
                     } else {
-                        System.out.println("point: " + selectedPoint + "     belongs in: " + k);
                         Track.cornerPoints.add(k, new int[]{x, y});
                         selectedPoint = k;
                         break;
                     }
                 }
-                System.out.println(selectedPoint);
                 mouseActivated = true;
             }
         }
-
     }
 
     @Override
