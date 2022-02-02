@@ -4,31 +4,31 @@ import java.awt.*;
 
 public class Constants {
 
-    public static final int PANEL_WIDTH = 1000;
-    public static final int PANEL_HEIGHT = 1000;
+    public static final int PANEL_WIDTH = 800;
+    public static final int PANEL_HEIGHT = 600;
 
     public static final int TRACK_RESOLUTION = 20;
-    public static final int SPAWN_X = 800;
+    public static final int SPAWN_X = 500;
     public static final int SPAWN_Y = 50;
-    public static final int NPC_SIZE = 40;
-    public static final int CORNER_SIZE = 25;
+    public static final int NPC_SIZE = 20;
+    public static final int CORNER_SIZE = 12;
 
 
-    public static final int DEBUG_SIZE = 8;
+    public static final int DEBUG_SIZE = 5;
     public static final int TARGET_OFFSET = 5;
     public static final int PREDICT_DISTANCE = 15;
 
-    public static final int DETECTION_RANGE = 200;
+    public static final int DETECTION_RANGE = 100;
 
     public static final double[] VELOCITY = {0, 0};
     public static final double[] ACCELERATION = {0, 0};
-    public static final int MAX_SPEED = 5;
+    public static final int MAX_SPEED = 3;
     public static final double MAX_FORCE = 0.1;
     public static final int REFRESH_RATE = 10;
 
-    public static final int TRACK_RADIUS = 25;
-    public static final int TRACK_THICKNESS = 50;
-    public static final int TRACK_SEG_INTERACT_LIMIT = 25;
+    public static final int TRACK_RADIUS = 12;
+    public static final int TRACK_THICKNESS = 40;
+    public static final int TRACK_SEG_INTERACT_LIMIT = 12;
 
 
     public static boolean DEBUG = true;
@@ -57,13 +57,15 @@ public class Constants {
     // Track initialisation corners
     public static final int[][] TRACK_CORNERS = {
             {100, 100},
-            {100, 900},
-            {500, 500},
-            {685, 750},
-            {750, 825},
-            {800, 840},
-            {865, 820},
-            {900, 750},
-            {900, 100}
+            {100, 415},
+            {160, 465},
+            {210, 470},
+            {330, 320},
+            {400, 312},
+            {650, 500},
+            {700, 460},
+            {600, 300},
+            {670, 250},
+            {724, 100}
     };
 }
