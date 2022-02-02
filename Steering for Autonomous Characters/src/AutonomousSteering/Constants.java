@@ -18,7 +18,9 @@ public class Constants {
     public static final int TARGET_OFFSET = 5;
     public static final int PREDICT_DISTANCE = 15;
 
-    public static final int DETECTION_RANGE = 100;
+    public static final int DETECTION_RANGE = 75;
+    public static final int DETECTION_FALLOFF = 20;
+    public static final double DETECTION_OFFSET = 1;
 
     public static final double[] VELOCITY = {0, 0};
     public static final double[] ACCELERATION = {0, 0};
@@ -31,10 +33,10 @@ public class Constants {
     public static final int TRACK_SEG_INTERACT_LIMIT = 12;
 
 
-    public static boolean DEBUG = true;
-    public static boolean SHOW_PATH = true;
+    public static boolean DEBUG = false;
+    public static boolean SHOW_PATH = false;
 
-    public static final int AI_COUNT = 5;
+    public static final int AI_COUNT = 10;
     public static final boolean RND_SPAWN = true;
 
     public static double INSETS_TOP = 0;

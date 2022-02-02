@@ -11,6 +11,7 @@ public class AI extends Ellipse2D.Double implements IObstacle {
     private double[] velocity = Arrays.copyOf(Constants.VELOCITY, 2);
     private double[] acceleration = Arrays.copyOf(Constants.ACCELERATION, 2);
     private boolean avoidObject = false;
+    private boolean turnRight = false;
 
     private double[] steerTarget = new double[2];
     private double force;
@@ -119,5 +120,13 @@ public class AI extends Ellipse2D.Double implements IObstacle {
 
     public void setForce(double force) {
         this.force = force;
+    }
+
+    public boolean isTurnRight() {
+        return turnRight;
+    }
+
+    public void setTurnRight(boolean turnRight) {
+        this.turnRight = turnRight;
     }
 }
