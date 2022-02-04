@@ -1,50 +1,61 @@
 package AutonomousSteering;
 
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
 
 public class AIObstacleAvoidance {
+
     public static void detectObjects(AI ai) {
         updateVision(ai);
         visionObstructed(ai);
     }
 
     private static void visionObstructed(AI ai) {
-        AI object = MyPanel.getTestAI();
-        double x = object.body.x - object.body.getWidth() / 2;
-        double y = object.body.y - object.body.getWidth() / 2;
-        double size = object.body.getWidth();
-        Rectangle2D.Double object_obstacle = new Rectangle2D.Double(x, y, size, size);
+        boolean avoidObject = false;
+        ArrayList<Double> impactDistance = new ArrayList<>();
+        ArrayList<double[]> impactCoord = new ArrayList<>();
+        int index = 0;
 
-        boolean a = ai.detection1.intersects(object_obstacle);
-        boolean b = ai.detection2.intersects(object_obstacle);
-        boolean c = ai.detection3.intersects(object_obstacle);
-        boolean avoidObject = a || b || c;
+        for (RayTrace ray: ai.getVisionRays()) {
+            if (!Double.isNaN(ray.getImpactPointDistance()) && ray.isObstacleDetected()) {
+                avoidObject = true;
+                impactDistance.add(ray.getImpactPointDistance());
+                impactCoord.add(ray.getImpactPointCoord());
+            }
+        }
 
+        // Find index of longest distance
+        if (avoidObject) {
+            for (int i = 0; i < impactDistance.size(); i++) {
+                index = impactDistance.get(i) < impactDistance.get(index) ? i : index;
+            }
+        }
+
+        // Find direction only one time
         if (avoidObject != ai.isAvoidObject()) {
             ai.setAvoidObject(avoidObject);
-
             if (avoidObject) {
-                findDirection(ai, object_obstacle);
+                findDirection(ai, impactCoord.get(index));
             }
         }
 
         if (avoidObject){
-            avoidObstacle(ai, object_obstacle);
+            avoidObstacle(ai, impactCoord.get(index));
         }
     }
 
-    private static void findDirection(AI ai, Rectangle2D.Double object) {
+    private static void findDirection(AI ai, double[] coord) {
         double[] velocity = ai.getVelocity();
         double aX = ai.body.x;
         double aY = ai.body.y;
         double bX = ai.body.x + velocity[0];
         double bY = ai.body.y + velocity[1];
-        double mX = object.getCenterX();
-        double mY = object.getCenterY();
+        double mX = coord[0];
+        double mY = coord[1];
         ai.setTurnRight(((bX - aX) * (mY - aY) - (bY - aY) * (mX - aX)) > 0);
     }
 
-    private static void avoidObstacle(AI ai, Rectangle2D.Double object) {
+    private static void avoidObstacle(AI ai, double[] obstacleCoord) {
 
         double[] velocity = ai.getVelocity();
         double speed = VectorMath.vectorLength(velocity);
@@ -59,34 +70,34 @@ public class AIObstacleAvoidance {
             targetY = ai.body.y + (velocity[0] / speed) * 150;
         }
 
-        double distance = VectorMath.vectorLength(ai.body.x, object.getCenterX(), ai.body.y, object.getCenterY());
+        double distance = VectorMath.vectorLength(ai.body.x, obstacleCoord[0], ai.body.y, obstacleCoord[1]);
         ai.setForce(VectorMath.forceFalloff(distance, Constants.DETECTION_RANGE, Constants.DETECTION_FALLOFF));
-
         ai.setSteerTarget(new double[] {targetX, targetY});
     }
 
     private static void updateVision(AI ai) {
-        double[] velocity = ai.getVelocity();
-        double length = VectorMath.vectorLength(0, velocity[0], 0, velocity[1]);
-        double[] normalVelocity = {-velocity[1], velocity[0]};
-        if (length == 0.0) {
-            length = 0.001;
+        RayTrace[] rayTraces = ai.getVisionRays();
+
+        // Distribute the vision rods evenly across the AI body
+        for (int i = 0; i < rayTraces.length; i++) {
+            double position = 1.0 / (rayTraces.length - 1.0) * i;
+            moveVisionRod(rayTraces[i], ai.body.x, ai.body.y, ai.getVelocity(), position);
         }
-        double offsetX = (normalVelocity[0] / length) * Constants.NPC_SIZE / 2.0;
-        double offsetY = (normalVelocity[1] / length) * Constants.NPC_SIZE / 2.0;
-        ai.detection1.x1 = ai.body.x + offsetX;
-        ai.detection1.x2 = ai.body.x + (velocity[0] / length) * Constants.DETECTION_RANGE + (offsetX * Constants.DETECTION_OFFSET);
-        ai.detection1.y1 = ai.body.y + offsetY;
-        ai.detection1.y2 = ai.body.y + (velocity[1] / length) * Constants.DETECTION_RANGE + (offsetY * Constants.DETECTION_OFFSET);
+    }
 
-        ai.detection2.x1 = ai.body.x;
-        ai.detection2.x2 = ai.body.x + (velocity[0] / length) * Constants.DETECTION_RANGE;
-        ai.detection2.y1 = ai.body.y;
-        ai.detection2.y2 = ai.body.y + (velocity[1] / length) * Constants.DETECTION_RANGE;
+    private static void moveVisionRod(RayTrace rayTrace, double bodyX, double bodyY, double[] velocity, double position) {
 
-        ai.detection3.x1 = ai.body.x - offsetX;
-        ai.detection3.x2 = ai.body.x + (velocity[0] / length) * Constants.DETECTION_RANGE - (offsetX * Constants.DETECTION_OFFSET);
-        ai.detection3.y1 = ai.body.y - offsetY;
-        ai.detection3.y2 = ai.body.y + (velocity[1] / length) * Constants.DETECTION_RANGE - (offsetY * Constants.DETECTION_OFFSET);
+        double speed = VectorMath.vectorLength(0, velocity[0], 0, velocity[1]);
+        double[] velocityUnitVector = {0, 0};
+        if (speed > 0.0) {
+            velocityUnitVector = VectorMath.unitVector(velocity);
+        }
+        double offsetX = (velocity[1] * Constants.NPC_SIZE * (1 - 2 * position)) / (2 * speed);
+        double offsetY = (velocity[0] * Constants.NPC_SIZE * (-1 + 2 * position)) / (2 * speed);
+
+        rayTrace.trace.x1 = bodyX + offsetX;
+        rayTrace.trace.x2 = bodyX + velocityUnitVector[0] * Constants.DETECTION_RANGE + offsetX * Constants.DETECTION_OFFSET;
+        rayTrace.trace.y1 = bodyY + offsetY;
+        rayTrace.trace.y2 = bodyY + velocityUnitVector[1] * Constants.DETECTION_RANGE + offsetY * Constants.DETECTION_OFFSET;
     }
 }

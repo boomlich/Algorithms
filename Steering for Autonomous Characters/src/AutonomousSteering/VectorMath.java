@@ -19,15 +19,6 @@ public class VectorMath {
         return vectorLength(0, vector[0], 0, vector[1]);
     }
 
-
-    /**
-     *
-     * @param x
-     * @param y
-     * @param pointIndex
-     * @param point
-     * @return smallestDistance and pointIndex (double)
-     */
     public static double[] nearestPoint(double x, double y, int pointIndex, double[] point) {
         int i = 0;
         double smallestDistance = 1000000;
@@ -44,10 +35,13 @@ public class VectorMath {
         return new double[]{smallestDistance, pointIndex};
     }
 
-
     public static double forceFalloff(double distance, double maxDistance, double steepness) {
         double slope = maxDistance/steepness;
         return 1 / (1 + Math.pow(Math.E, - ((slope * 2) / maxDistance) * distance + slope));
     }
 
+    public static double[] unitVector(double[] vector) {
+        double length = vectorLength(vector);
+        return new double[]{vector[0] / length, vector[1] / length};
+    }
 }

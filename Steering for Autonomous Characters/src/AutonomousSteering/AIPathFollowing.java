@@ -9,7 +9,6 @@ public class AIPathFollowing {
 
     public static double seek(AI ai) {
         futurePoint(ai);
-
         double smallestDistance = findNearestPoint(ai);
         return VectorMath.forceFalloff(smallestDistance, 75, 15);
     }

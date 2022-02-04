@@ -3,6 +3,8 @@ package AutonomousSteering;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import javax.swing.*;
 
@@ -12,14 +14,9 @@ public class MyPanel extends JPanel implements ActionListener{
     static AI[] listAI = new AI[Constants.AI_COUNT];
     Path2D.Double followPath;
     LinkedList<double[]> points = new LinkedList<>();
-
-    Rectangle2D.Double testRect1 = new Rectangle2D.Double(25, 0, 50, 50);
-    double speed = 0.5;
-
-    static Wall myWall;
-
-    private static AI testAI = new AI(500, 100);
-
+    static Wall myWall = new Wall(300, 50, 50, 100);
+    private static final AI testAI = new AI(100, 100, 5000);
+    static ArrayList<IObstacle> allObstacles = new ArrayList<>();
 
     MyPanel(){
         this.setPreferredSize(new Dimension(Constants.PANEL_WIDTH,Constants.PANEL_HEIGHT));
@@ -29,18 +26,18 @@ public class MyPanel extends JPanel implements ActionListener{
 
         // Add AI to the track
         for (int i = 0; i < Constants.AI_COUNT; i++) {
-            listAI[i] = new AI(Constants.SPAWN_X, Constants.SPAWN_Y);
+            listAI[i] = new AI(Constants.SPAWN_X, Constants.SPAWN_Y, i);
         }
 
-
-
-        myWall = new Wall(500, 50, 50, 100);
-
-        testAI.body.x = 500;
+        testAI.body.x = 100;
         testAI.body.y = 100;
 
         new Track();
         getPath();
+
+        allObstacles.add(myWall);
+        allObstacles.add(testAI);
+        allObstacles.addAll(Arrays.asList(listAI));
     }
 
     private void getPath() {
@@ -48,17 +45,10 @@ public class MyPanel extends JPanel implements ActionListener{
         points = Track.getTrackCoordinates();
     }
 
-    public static AI[] getAI() {
-        return listAI;
-    }
 
-    public static AI getTestAI() {
-        return testAI;
+    public static ArrayList<IObstacle> getAllObstacles() {
+        return allObstacles;
     }
-
-//    public static Wall getWall(){
-//        return myWall;
-//    }
 
     public static void drawCustomCircle(Ellipse2D.Double shape, Color color, Graphics2D g2D) {
         AffineTransform reset = g2D.getTransform();
@@ -97,33 +87,45 @@ public class MyPanel extends JPanel implements ActionListener{
             drawDebug(g2D, listAI);
         }
 
-        g2D.setStroke(new BasicStroke(2));
-//        g2D.draw(myWall.body);
-
         drawCustomCircle(testAI.body,Color.orange, g2D);
+
+        g2D.setStroke(new BasicStroke(2));
+        g2D.draw(myWall.body);
+        g2D.setColor(Color.green);
+        for (Line2D line: testAI.getBodyLines()) {
+            g2D.draw(line);
+        }
+
 
         g2D.dispose();
     }
 
     private static void drawDebug(Graphics2D g2D, AI[] listAI) {
-        // AI targets
         for (AI x: listAI) {
+
+            // Desired and steering velocity
             g2D.setStroke(new BasicStroke(2));
             g2D.setColor(Color.green);
             g2D.draw(x.desiredVel);
-
             g2D.setColor(Color.red);
             g2D.draw(x.steeringVel);
 
+            // Path following targets
             drawCustomCircle(x.futurePos, Color.green, g2D);
             drawCustomCircle(x.onLine, Color.MAGENTA, g2D);
             drawCustomCircle(x.target, Color.red, g2D);
 
-            g2D.setColor(Color.WHITE);
-            g2D.draw(x.detection1);
-            g2D.draw(x.detection2);
-            g2D.draw(x.detection3);
-
+            // Obstacle raytrace
+            g2D.setStroke(new BasicStroke(1));
+            for (AI ai: listAI) {
+                for (RayTrace ray: ai.getVisionRays()) {
+                    g2D.setColor(Color.red);
+                    g2D.draw(ray.trace);
+                    g2D.setColor(Color.green);
+                    g2D.draw(ray.traceSeek);
+                    drawCustomCircle(ray.impactPoint, Color.blue, g2D);
+                }
+            }
         }
     }
 

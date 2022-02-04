@@ -11,7 +11,7 @@ import java.util.LinkedList;
 public class Track {
 
     static ArrayList<int[]> cornerPoints = new ArrayList<>();
-    private static LinkedList<double[]> trackCoordinates = new LinkedList<>();
+    private static final LinkedList<double[]> trackCoordinates = new LinkedList<>();
     private static Path2D.Double trackPath;
     static ArrayList<Ellipse2D.Double> cornerShapes = new ArrayList<>();
     static ArrayList<Integer> segmentPointIndex = new ArrayList<>();
