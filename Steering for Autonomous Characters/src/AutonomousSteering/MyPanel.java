@@ -15,7 +15,6 @@ public class MyPanel extends JPanel implements ActionListener{
     Path2D.Double followPath;
     LinkedList<double[]> points = new LinkedList<>();
     static Wall myWall = new Wall(300, 50, 50, 100);
-    private static final AI testAI = new AI(100, 100, 5000);
     static ArrayList<IObstacle> allObstacles = new ArrayList<>();
 
     MyPanel(){
@@ -29,15 +28,13 @@ public class MyPanel extends JPanel implements ActionListener{
             listAI[i] = new AI(Constants.SPAWN_X, Constants.SPAWN_Y, i);
         }
 
-        testAI.body.x = 100;
-        testAI.body.y = 100;
+        // Mark objects for obstacle avoidance
+        allObstacles.add(myWall);
+        allObstacles.addAll(Arrays.asList(listAI));
 
         new Track();
         getPath();
 
-        allObstacles.add(myWall);
-        allObstacles.add(testAI);
-        allObstacles.addAll(Arrays.asList(listAI));
     }
 
     private void getPath() {
@@ -87,15 +84,9 @@ public class MyPanel extends JPanel implements ActionListener{
             drawDebug(g2D, listAI);
         }
 
-        drawCustomCircle(testAI.body,Color.orange, g2D);
 
         g2D.setStroke(new BasicStroke(2));
         g2D.draw(myWall.body);
-        g2D.setColor(Color.green);
-        for (Line2D line: testAI.getBodyLines()) {
-            g2D.draw(line);
-        }
-
 
         g2D.dispose();
     }
@@ -104,7 +95,7 @@ public class MyPanel extends JPanel implements ActionListener{
         for (AI x: listAI) {
 
             // Desired and steering velocity
-            g2D.setStroke(new BasicStroke(2));
+            g2D.setStroke(Constants.D_VELOCITY);
             g2D.setColor(Color.green);
             g2D.draw(x.desiredVel);
             g2D.setColor(Color.red);
@@ -116,25 +107,24 @@ public class MyPanel extends JPanel implements ActionListener{
             drawCustomCircle(x.target, Color.red, g2D);
 
             // Obstacle raytrace
-            g2D.setStroke(new BasicStroke(1));
-            for (AI ai: listAI) {
-                for (RayTrace ray: ai.getVisionRays()) {
-                    g2D.setColor(Color.red);
-                    g2D.draw(ray.trace);
-                    g2D.setColor(Color.green);
-                    g2D.draw(ray.traceSeek);
-                    drawCustomCircle(ray.impactPoint, Color.blue, g2D);
-                }
+
+            for (RayTrace ray: x.getVisionRays()) {
+                g2D.setStroke(Constants.D_TRACE);
+                g2D.setColor(Color.red);
+                g2D.draw(ray.trace);
+                g2D.setColor(Color.green);
+                g2D.draw(ray.traceSeek);
+                drawCustomCircle(ray.impactPoint, Color.blue, g2D);
             }
         }
     }
 
     private static void showPath(Path2D followPath, Graphics2D g2D) {
         g2D.setColor(Constants.C_PATH_RADIUS);
-        g2D.setStroke(new BasicStroke(Constants.TRACK_RADIUS * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2D.setStroke(Constants.TRACK_BRUSH);
         g2D.draw(followPath);
 
-        g2D.setStroke(new BasicStroke(2));
+        g2D.setStroke(Constants.TRACK_EDIT);
         g2D.setColor(Constants.C_PATH);
         g2D.draw(followPath);
 

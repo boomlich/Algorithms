@@ -58,17 +58,17 @@ public class AIObstacleAvoidance {
     private static void avoidObstacle(AI ai, double[] obstacleCoord) {
 
         double[] velocity = ai.getVelocity();
-        double speed = VectorMath.vectorLength(velocity);
-        double targetX;
-        double targetY;
+        double magnitude = VectorMath.vectorLength(velocity) * 150;
+        double magnitudeX = velocity[1] / magnitude;
+        double magnitudeY = velocity[0] / magnitude;
 
+        int a = 1;
         if (ai.isTurnRight()) {
-            targetX = ai.body.x + (velocity[1] / speed) * 150;
-            targetY = ai.body.y + (-velocity[0] / speed) * 150;
-        } else {
-            targetX = ai.body.x + (-velocity[1] / speed) * 150;
-            targetY = ai.body.y + (velocity[0] / speed) * 150;
+            a = -1 * a;
         }
+
+        double targetX = ai.body.x + (-a * magnitudeX);
+        double targetY = ai.body.y + (a * magnitudeY);
 
         double distance = VectorMath.vectorLength(ai.body.x, obstacleCoord[0], ai.body.y, obstacleCoord[1]);
         ai.setForce(VectorMath.forceFalloff(distance, Constants.DETECTION_RANGE, Constants.DETECTION_FALLOFF));
@@ -92,12 +92,13 @@ public class AIObstacleAvoidance {
         if (speed > 0.0) {
             velocityUnitVector = VectorMath.unitVector(velocity);
         }
-        double offsetX = (velocity[1] * Constants.NPC_SIZE * (1 - 2 * position)) / (2 * speed);
-        double offsetY = (velocity[0] * Constants.NPC_SIZE * (-1 + 2 * position)) / (2 * speed);
 
-        rayTrace.trace.x1 = bodyX + offsetX;
-        rayTrace.trace.x2 = bodyX + velocityUnitVector[0] * Constants.DETECTION_RANGE + offsetX * Constants.DETECTION_OFFSET;
-        rayTrace.trace.y1 = bodyY + offsetY;
-        rayTrace.trace.y2 = bodyY + velocityUnitVector[1] * Constants.DETECTION_RANGE + offsetY * Constants.DETECTION_OFFSET;
+        double x = bodyX + (velocity[1] * Constants.NPC_SIZE * (1 - 2 * position)) / (2 * speed);
+        double y = bodyY + (velocity[0] * Constants.NPC_SIZE * (-1 + 2 * position)) / (2 * speed);
+
+        rayTrace.trace.x1 = x;
+        rayTrace.trace.x2 = x + velocityUnitVector[0] * Constants.DETECTION_RANGE;
+        rayTrace.trace.y1 = y;
+        rayTrace.trace.y2 = y + velocityUnitVector[1] * Constants.DETECTION_RANGE;
     }
 }

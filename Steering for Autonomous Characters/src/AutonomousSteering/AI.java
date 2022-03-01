@@ -18,13 +18,8 @@ public class AI extends Ellipse2D.Double implements IObstacle {
     private double[] steerTarget = new double[2];
     private double force;
 
-    Ellipse2D.Double body;
-    Ellipse2D.Double futurePos;
-    Ellipse2D.Double onLine;
-    Ellipse2D.Double target;
-
-    Line2D.Double desiredVel;
-    Line2D.Double steeringVel;
+    Ellipse2D.Double body, futurePos, onLine, target;
+    Line2D.Double desiredVel, steeringVel;
 
 
     public AI(int x, int y, int identifier) {
@@ -134,7 +129,6 @@ public class AI extends Ellipse2D.Double implements IObstacle {
     @Override
     public Rectangle2D getBoundingBox() {
         return body.getBounds2D();
-//        return null;
     }
 
     @Override

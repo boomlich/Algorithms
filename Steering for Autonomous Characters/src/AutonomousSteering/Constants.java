@@ -16,6 +16,9 @@ public class Constants {
     public static final int DEBUG_SIZE = 5;
     public static boolean DEBUG = false;
     public static boolean SHOW_PATH = false;
+    public static final BasicStroke D_TRACE = new BasicStroke(1);
+    public static final BasicStroke D_VELOCITY = new BasicStroke(2);
+
 
 
     // AI PATH FOLLOWING
@@ -46,6 +49,8 @@ public class Constants {
     public static final int TRACK_THICKNESS = 40;
     public static final int TRACK_SEG_INTERACT_LIMIT = 12;
     public static final int CORNER_SIZE = 12;
+    public static final BasicStroke TRACK_BRUSH = new BasicStroke(Constants.TRACK_RADIUS * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+    public static final BasicStroke TRACK_EDIT = new BasicStroke(2);
 
     // RESET
     public static boolean RESET = false;

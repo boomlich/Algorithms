@@ -40,6 +40,11 @@ public class VectorMath {
         return 1 / (1 + Math.pow(Math.E, - ((slope * 2) / maxDistance) * distance + slope));
     }
 
+    /**
+     *
+     * @param vector
+     * @return unit vector of the input
+     */
     public static double[] unitVector(double[] vector) {
         double length = vectorLength(vector);
         return new double[]{vector[0] / length, vector[1] / length};
